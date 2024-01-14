@@ -13,6 +13,10 @@ const playlistSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true
+    },
+    isPublic: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true
