@@ -25,7 +25,6 @@ const songSchema = new mongoose.Schema(
         },
         genre: {
             type: String,
-            required: [true, "Genre is required"],
             trim: true,
         },
         releaseDate: {
@@ -35,7 +34,20 @@ const songSchema = new mongoose.Schema(
         duration: {
             type: Number,
             required: [true, "Duration is required"],
-        }
+        },
+        songUrl: {
+            publicId: {
+
+            },
+            url: {
+                type: String,
+                required: [true, "Song url is required"],
+            }
+        },
+        imageUrl: {
+            type: String,
+            required: [true, "Image url is required"],
+        },
     },
     {
         timestamps: true,

@@ -4,9 +4,9 @@ const { sendToken } = require("../utils/server.utils.js");
 
 exports.registerUser = async (req, res) => {
     try {
-        const { name, providerId, password, userType } = req.body;
+        const { name, providerId, password, userType, mobile } = req.body;
 
-        if (!name || !providerId || !password) {
+        if (!name || !providerId || !password || !mobile) {
             return res.status(400).json({
                 message: "All fields are required"
             })
@@ -28,13 +28,20 @@ exports.registerUser = async (req, res) => {
             name,
             providerId,
             password: hash,
+            mobile,
             role: userType === "vendor" ? "vendor" : "user"
         })).save();
 
         sendToken(req, res, data);
 
         return res.status(201).json({
-            message: "User created successfully"
+            message: "User created successfully",
+            user: {
+                name: data.name,
+                providerId: data.providerId,
+                mobile: data.mobile,
+                role: data.role
+            }
         })
     } catch (err) {
         return res.status(500).json({
@@ -54,7 +61,8 @@ exports.loginUser = async (req, res) => {
         }
         
         const user = await User.findOne({
-            providerId
+            providerId,
+            role: req.query.userType === "vendor" ? "vendor" : "user"
         });
         
         if (!user) {
@@ -74,7 +82,27 @@ exports.loginUser = async (req, res) => {
         sendToken(req, res, user);
         
         res.status(200).json({
-            message: "User logged in successfully"
+            message: "User logged in successfully",
+            user: {
+                name: user.name,
+                providerId: user.providerId,
+                mobile: user.mobile,
+                role: user.role
+            }
+        })
+    } catch (err) {
+        return res.status(500).json({
+            message: "Some error occured",
+            error: err.message
+        })
+    }
+}
+
+exports.logoutUser = async (req, res) => {
+    try {
+        res.clearCookie("x-auth-token");
+        res.status(200).json({
+            message: "User logged out successfully"
         })
     } catch (err) {
         return res.status(500).json({

@@ -13,7 +13,6 @@ exports.sendToken = (req, res, user) => {
             httpOnly: true
         });
     } catch(err){
-        console.log(err);
         return res.status(500).json({
             message: "Some error occured"
         })
