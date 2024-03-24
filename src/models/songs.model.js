@@ -31,13 +31,9 @@ const songSchema = new mongoose.Schema(
             type: Date,
             required: [true, "Release date is required"],
         },
-        duration: {
-            type: Number,
-            required: [true, "Duration is required"],
-        },
         songUrl: {
             publicId: {
-
+                type: String
             },
             url: {
                 type: String,

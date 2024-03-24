@@ -1,10 +1,11 @@
-const cloud = require("../../config/cloudinary.js");
+const { dataUri } = require("../../config/multer.js");
 const { Song } = require("../models/songs.model.js");
 const { User } = require("../models/user.model.js");
+const cloud = require("../../config/cloudinary.js");
 
 exports.createSong = async (req, res) => {
     try {
-        const { title, artist, album, genre, releaseDate, duration, song, imageUrl } = req.body;
+        const { title, artist, album, genre, releaseDate, imageUrl } = JSON.parse(req.body.metadata);
 
         let user = await User.findById(req.user_id);
 
@@ -14,13 +15,13 @@ exports.createSong = async (req, res) => {
             })
         }
 
-        if (!song) {
+        if (!req.file) {
             return res.status(400).json({
                 message: "Song file is required"
             })
         }
 
-        const songUrl = await cloud.uploader.upload(song, {
+        let songUrl = await cloud.uploader.upload(req.filepath, {
             resource_type: "auto",
             folder: "songs",
             overwrite: true,
@@ -35,7 +36,6 @@ exports.createSong = async (req, res) => {
             album,
             genre,
             releaseDate,
-            duration,
             songUrl: { url: songUrl.secure_url, publicId: songUrl.public_id },
             imageUrl
         });
@@ -45,6 +45,7 @@ exports.createSong = async (req, res) => {
             song: songData,
         });
     } catch (error) {
+        console.log(error);
         res.status(400).json({
             status: "fail",
             message: error.message,
@@ -63,7 +64,7 @@ exports.getSongs = async (req, res) => {
     } catch (error) {
         res.status(400).json({
             status: "fail",
-            message: error.message,
+            message: error.message
         });
     }
 }
